@@ -11,7 +11,7 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000
  */
 export async function healthCheck() {
   try {
-    const response = await axios.get('http://localhost:5000/health');
+    const response = await axios.get(`${API_BASE_URL}/health`);
     return response.status === 200 && response.data.status === 'ok';
   } catch (error) {
     console.error('健康检查失败:', error);
