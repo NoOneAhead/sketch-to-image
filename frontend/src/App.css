@@ -1,0 +1,277 @@
+@import "./styles/global.css"; 
+
+/* 顶部导航 */
+.header {
+  text-align: center;
+  padding: 20px 0;
+  margin-bottom: 30px;
+}
+
+.header h1 {
+  font-size: 32px;
+  color: var(--color-primary);
+  margin-bottom: 8px;
+}
+
+.header-right {
+  margin-top: 10px;
+}
+
+.status {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.status.ok {
+  background: rgba(76, 175, 80, 0.1);
+  color: var(--color-success);
+}
+
+.status.error {
+  background: rgba(244, 67, 54, 0.1);
+  color: var(--color-error);
+}
+
+/* 顶部模式切换 */
+.mode-selector-top {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin-bottom: 30px;
+  max-width: 400px;
+}
+
+.mode-selector-top .mode-btn {
+  padding: 12px 20px;
+  border: 2px solid var(--color-gray-border);
+  border-radius: 8px;
+  background: white;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 15px;
+  transition: var(--transition-base);
+}
+
+.mode-selector-top .mode-btn:hover {
+  border-color: var(--color-primary);
+}
+
+.mode-selector-top .mode-btn.active {
+  background: var(--gradient-primary);
+  color: white;
+  border-color: var(--color-primary);
+}
+
+/* 布局调整 */
+.layout {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 30px;
+}
+
+.content-section {
+  background: white;
+  border-radius: 16px;
+  padding: 30px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.sketch-section {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.input-group .hint {
+  display: block;
+  margin-top: 6px;
+  font-size: 12px;
+  color: #999;
+}
+
+/* 页脚样式 */
+.footer {
+  text-align: center;
+  padding: 30px 0;
+  margin-top: 50px;
+  color: var(--color-text-secondary);
+  font-size: 14px;
+}
+
+/* 响应式适配 */
+@media (max-width: 1024px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .input-panel {
+    position: static;
+  }
+}
+
+@media (max-width: 768px) {
+  .header h1 {
+    font-size: 24px;
+  }
+  
+  .content-section {
+    padding: 20px;
+  }
+}
+
+/* ... 保留原有代码，新增/修改以下部分 ... */
+
+/* 全局重置 */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+body {
+  background-color: #f8fafc;
+  color: #1e293b;
+  padding: 16px;
+  min-height: 100vh; /* 让页面占满屏幕高度 */
+}
+
+/* 头部样式 */
+.header {
+  text-align: center;
+  padding: 16px 0;
+  margin-bottom: 16px;
+  max-width: 1800px; /* 和编辑器容器对齐 */
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.header h1 {
+  font-size: 28px;
+  color: var(--primary);
+  margin-bottom: 8px;
+}
+
+.status {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.status.ok {
+  background: rgba(76, 175, 80, 0.1);
+  color: #4caf50;
+}
+
+.status.error {
+  background: rgba(244, 67, 54, 0.1);
+  color: #f44336;
+}
+
+/* 布局调整（核心：移除左侧固定列，全屏适配） */
+.layout {
+  display: grid;
+  grid-template-columns: 1fr; /* 单列布局，避免挤压 */
+  gap: 24px;
+  max-width: 1800px; /* 适配大屏 */
+  margin: 0 auto;
+  width: 100%;
+  min-height: calc(100vh - 120px); /* 占满屏幕剩余高度 */
+}
+
+.content-section {
+  background: white;
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  box-shadow: var(--shadow-md);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.sketch-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  height: 100%;
+}
+
+/* 顶部模式切换（保留原有样式，仅调整间距） */
+.mode-selector-top {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin-bottom: 24px;
+  max-width: 400px;
+}
+
+.mode-selector-top .mode-btn {
+  padding: 12px 20px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  background: white;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 15px;
+  transition: all 0.3s;
+}
+
+.mode-selector-top .mode-btn:hover {
+  border-color: #667eea;
+}
+
+.mode-selector-top .mode-btn.active {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-color: #667eea;
+}
+
+/* 响应式适配 */
+@media (max-width: 1024px) {
+  .layout {
+    padding: 0 10px;
+  }
+  .content-section {
+    padding: 16px;
+  }
+}
+
+.footer {
+  text-align: center;
+  padding: 20px 0;
+  margin-top: 24px;
+  color: var(--gray-600);
+  font-size: 14px;
+  max-width: 1800px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* 新增：三步流程样式 - 每行单独排列、宽度最大化 */
+.steps-container {
+  width: 100%; /* 容器占满父级宽度 */
+  display: flex;
+  flex-direction: column; /* 垂直排列，每个步骤单独一行 */
+  gap: 16px; /* 步骤之间的间距 */
+}
+
+.step-item {
+  width: 100%; /* 每个步骤占满容器宽度 */
+  padding: 20px 24px; /* 内边距增大，视觉更宽 */
+  background: #f9fafb;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  font-size: 16px;
+  line-height: 1.6;
+  box-sizing: border-box;
+}
+
+/* 响应式下保持步骤宽度最大化 */
+@media (max-width: 768px) {
+  .step-item {
+    padding: 16px 20px;
+    font-size: 15px;
+  }
+}
