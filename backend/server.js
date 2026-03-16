@@ -63,7 +63,7 @@ app.use((req, res, next) => {
 
 // ========== 路由 ==========
 // 业务路由
-app.use('/api/images', imageRoutes);
+app.use('/images', imageRoutes);
 
 // 健康检查（增强返回信息）
 app.get('/health', (req, res) => {
