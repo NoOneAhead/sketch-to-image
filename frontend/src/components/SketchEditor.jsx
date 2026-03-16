@@ -144,9 +144,9 @@ export default function SketchEditor() {
     setError('');
 
     try {
-      console.log('🔍 开始识别草图...');
+      console.log('开始识别草图');
       const result = await recognizeSketchFeatures(canvasImage);
-      console.log('✅ 草图识别完成:', result);
+      console.log('草图识别完成');
       // 过滤识别结果，仅保留需要的字段（移除风格特征）
       const filteredAnalysis = {
         ...result,
@@ -176,7 +176,7 @@ export default function SketchEditor() {
     setError('');
 
     try {
-      console.log('🎨 开始生成图片...');
+      console.log('开始生成图片');
       // ========== 关键修改1：构建最终的prompt（强制替换风格） ==========
       const finalPrompt = `
 主体: ${analysis.structured_analysis.main_object}
@@ -188,9 +188,6 @@ export default function SketchEditor() {
 用户补充描述: ${userDescription || '无'}
       `.trim();
 
-      // 打印最终prompt，方便验证
-      console.log('📝 发送给AI的最终Prompt：', finalPrompt);
-
       // ========== 关键修改2：传递finalPrompt给API ==========
       const result = await generateImageFromSketch(
         canvasImage,        // 草图图片
@@ -199,7 +196,7 @@ export default function SketchEditor() {
         size,               // 图片尺寸
         styleFeatureMap[style] // 风格特征（兜底）
       );
-      console.log('✅ 图片生成完成:', result);
+      console.log('图片生成完成');
       setGeneratedImage(result);
     } catch (err) {
       setError(err.message || '生成失败');
@@ -339,9 +336,6 @@ export default function SketchEditor() {
                     <option value="cartoon">卡通</option>
                     <option value="3d">3D 渲染</option>
                   </select>
-                  <div className="style-feature-tip">
-                    <small>📝 风格特征：{styleFeatureMap[style].replace(/\n/g, '<br/>')}</small>
-                  </div>
                 </div>
                 <div className="config-item">
                   <label>图片尺寸</label>
@@ -371,17 +365,6 @@ export default function SketchEditor() {
               <div className="result-image">
                 <h4>✅ 生成完成！</h4>
                 <img src={generatedImage.image_url} alt="生成的图片" style={{maxWidth: '100%'}} />
-                <div className="result-info">
-                  <p>
-                    <strong>风格:</strong> {style}
-                  </p>
-                  <p>
-                    <strong>风格特征:</strong> {styleFeatureMap[style].replace(/\n/g, '<br/>')}
-                  </p>
-                  <p>
-                    <strong>尺寸:</strong> {size}
-                  </p>
-                </div>
                 <button
                   className="btn-download"
                   onClick={() => {
