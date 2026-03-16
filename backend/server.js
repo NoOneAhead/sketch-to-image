@@ -14,7 +14,7 @@ const NODE_ENV = process.env.NODE_ENV || 'development';
 
 // ========== 核心配置优化 ==========
 // 1. CORS 白名单从环境变量读取（更灵活）
-const allowedOrigins = (process.env.ALLOWED_ORIGINS || 'http://localhost:5173,http://localhost:3000,https://sketch-to-image-liart.vercel.app').split(',');
+const allowedOrigins = (process.env.ALLOWED_ORIGINS || 'http://localhost:5173,http://localhost:3000,https://qiansuo.top').split(',');
 
 // 2. CORS 配置增强（生产环境严格校验）
 const corsOptions = {
