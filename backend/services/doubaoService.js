@@ -1,258 +1,105 @@
-// 在文件最顶部
+import OpenAI from 'openai';
 import dotenv from 'dotenv';
 dotenv.config();
-import OpenAI from 'openai';
 
-// 风格配置库
-const STYLE_CONFIGS = {
-  realistic: {
-    name: '现实主义',
-    emoji: '🎬',
-    prompt: '高质量，照片级渲染，OC渲染，光线追踪，景深，超现实主义，质感真实',
-  },
-  anime: {
-    name: '动漫风格',
-    emoji: '🎌',
-    prompt: '日本动漫风格，二次元，线条清晰，色彩鲜艳，表情丰富',
-  },
-  oil_painting: {
-    name: '油画风格',
-    emoji: '🖼️',
-    prompt: '油画风格，笔触厚重，色彩深沉，光影效果，传统艺术',
-  },
-  cyberpunk: {
-    name: '赛博朋克',
-    emoji: '🌃',
-    prompt: '赛博朋克风格，霓虹灯，科技感，未来主义，深蓝，紫红色调',
-  },
-  watercolor: {
-    name: '水彩风格',
-    emoji: '🎨',
-    prompt: '水彩风格，色彩透明，笔触流畅，晕染效果，意境深远',
-  },
-  pixel_art: {
-    name: '像素艺术',
-    emoji: '👾',
-    prompt: '8位像素艺术，复古风格，像素化，怀旧游戏感',
-  },
-  sketch: {
-    name: '素描线稿',
-    emoji: '✏️',
-    prompt: '素描线稿风格，铅笔素描，线条细致，明暗层次丰富',
-  },
-  d3_model: {
-    name: '3D模型',
-    emoji: '🎯',
-    prompt: '3D渲染风格，三维立体效果，高精度模型，专业渲染',
-  },
-  ink_painting: {
-    name: '国画风格',
-    emoji: '🖌️',
-    prompt: '中国水墨画风格，笔墨意境，山水意境，留白艺术',
-  },
-  steampunk: {
-    name: '蒸汽朋克',
-    emoji: '⚙️',
-    prompt: '蒸汽朋克风格，机械齿轮，复古工业，金属质感',
-  },
-};
+const client = new OpenAI({
+  baseURL: "https://ark.cn-beijing.volces.com/api/v3",
+  apiKey: process.env.ARK_API_KEY,
+});
 
-class DoubaoService {
-  constructor() {
-    const apiKey = process.env.ARK_API_KEY;
-    if (!apiKey) {
-      throw new Error('❌ ARK_API_KEY 未配置，请在 .env 文件中设置');
-    }
+// 正确的风格提示词表
+const stylePrompts =  {
+      realistic: `现实主义核心特征：
+  1. 光影：物理级真实光影，自然漫反射+精准高光，符合现实光源逻辑，阴影层次丰富（软阴影/硬阴影随光源距离变化）；
+  2. 材质：还原真实物体质感（金属反光/布料纹理/皮肤毛孔/玻璃通透感），纹理细节1:1复刻现实；
+  3. 色彩：自然色彩过渡，无饱和度溢出，符合环境色影响规律，色温/色调贴合场景氛围；
+  4. 构图：透视关系精准，近大远小符合人眼视觉，景深效果自然（前景清晰/背景虚化）；
+  5. 细节：像素级精细度，毛发/纹理/磨损痕迹等微观细节完整呈现，无模糊或简化。`,
+      oil_painting: `油画风格核心特征：
+  1. 笔触：厚重肌理感笔触，可见明显的颜料堆叠效果，刮刀/画笔纹理交错，边缘有自然的颜料晕染；
+  2. 色彩：高饱和度+冷暖对比强烈，色彩层次丰富（多层罩染效果），暗部保留色彩层次不发黑；
+  3. 光影：戏剧化光影，高光区域提亮但保留笔触质感，阴影区域有色彩倾向（如蓝紫调阴影）；
+  4. 质感：画布纹理清晰可见（亚麻布/棉布纹理），颜料厚度带来的凹凸立体感；
+  5. 风格：兼具古典油画的厚重感与印象派的色彩表现力，笔触方向贴合物体结构走向。`,
+      watercolor: `水彩风格核心特征：
+  1. 通透感：颜料半透明叠加效果，底层色彩可透过上层显现，无厚重覆盖感；
+  2. 晕染：湿画法自然晕染边缘，色彩过渡柔和，有自然的水痕/飞白效果；
+  3. 笔触：轻透的刷笔纹理，笔触边缘模糊，保留水分扩散的自然形态；
+  4. 色彩：低饱和度柔和色调，以透明水色为主，留白区域作为高光/透气点；
+  5. 纸张：可见水彩纸纹理（粗纹/细纹），边缘有自然的颜料沉淀效果，整体轻盈空灵。`,
+      pencil_sketch: `铅笔素描风格核心特征：
+  1. 线条：明暗排线纹理（交叉排线/单向排线），线条密度对应明暗程度，轮廓线轻重有别；
+  2. 灰度：12级以上灰度层次，从纯白到深黑过渡自然，无断层；
+  3. 质感：铅笔粉末附着纸张的颗粒感，高光区域保留纸张本色，暗部无死黑；
+  4. 笔触：随物体结构变化的排线方向（如球体弧形排线/方体直线排线），有擦揉过渡效果；
+  5. 细节：轻笔触表现纹理（如布料纹路/皮肤肌理），重笔触强化轮廓，整体有手绘素描的呼吸感。`,
+      cartoon: `动漫风格核心特征：
+  1. 线条：简洁硬朗的轮廓线（无模糊/无渐变），线条粗细一致或按层级区分；
+  2. 色彩：高饱和纯色块，无渐变/无阴影过渡，色彩对比强烈且明快；
+  3. 造型：夸张的比例（如大头小身/大眼睛），简化的细节（无复杂纹理）；
+  4. 阴影：扁平化色块阴影（无羽化），仅做位置区分不做体积表现；
+  5. 风格：二次元/美式卡通混合风格，轮廓清晰，画面干净，无多余杂色/纹理。`,
+      '3d': `3D渲染风格核心特征：
+  1. 建模：多边形建模的精准轮廓，曲面细分带来的平滑质感，无手绘变形；
+  2. 材质：PBR物理材质（金属度/粗糙度/法线贴图），反射/折射符合物理规律；
+  3. 光影：全局光照（GI）效果，间接光反射自然，阴影有软硬度变化；
+  4. 渲染：光线追踪级渲染精度，抗锯齿无毛刺，景深/焦外虚化效果自然；
+  5. 细节：UV贴图纹理精准贴合模型，凹凸/置换贴图带来的立体纹理，环境光遮蔽（AO）增强体积感。`,
+      // 新增：赛博朋克
+      cyberpunk: `赛博朋克风格核心特征：
+  1. 色彩：高对比霓虹色调（品红/青蓝/亮紫为主），冷暖色强烈碰撞，暗部以深蓝/纯黑为基底；
+  2. 光影：霓虹灯管发光效果（光晕/辉光/光污染），全息投影的半透明光影，雨水反射的彩色光斑；
+  3. 场景：未来都市底层街区，密集的电子广告牌、垂吊线缆、破旧的金属建筑，东西方元素混搭；
+  4. 材质：磨损的金属/塑料质感，电子元件的电路板纹理，潮湿的路面反光，全息投影的通透感；
+  5. 细节：中英日文混合的霓虹招牌，生锈的金属铆钉，屏幕噪点/像素化干扰，雨水流淌的痕迹。`,
+      // 新增：像素艺术
+      pixel_art: `像素艺术风格核心特征：
+  1. 像素：固定像素网格（8/16/32/64位），边缘无抗锯齿，所有元素由方形像素块构成；
+  2. 色彩：有限调色板（8/16/256色），高对比纯色，无渐变/无模糊，色彩块边界清晰；
+  3. 造型：极简几何化造型，简化细节（如用1-2个像素表现眼睛），符合复古游戏视觉逻辑；
+  4. 光影：区块化光影（无过渡），用不同色阶的像素块表现明暗，高光/阴影为纯色块；
+  5. 风格：复古8-bit/16-bit游戏风格，像素颗粒感明显，画面有像素抖动/闪烁的复古效果。`,
+      // 新增：国画风格
+      ink_painting: `国画风格核心特征：
+  1. 笔墨：焦/浓/重/淡/清五墨层次，中锋/侧锋/逆锋笔触变化，飞白效果自然显现；
+  2. 构图：留白为核心（计白当黑），散点透视，虚实相生，主体突出、背景极简；
+  3. 色彩：以水墨黑白为主，淡彩为辅（花青/赭石/藤黄等矿物颜料），色彩淡雅不艳俗；
+  4. 质感：宣纸纹理可见，墨色晕染的洇散效果，线条刚柔并济（如兰叶描/铁线描）；
+  5. 题材：山水/花鸟/人物为主，意境优先，弱化写实细节，强调气韵生动、形神兼备。`,
+      // 新增：蒸汽朋克
+      steampunk: `蒸汽朋克风格核心特征：
+  1. 机械：黄铜/紫铜材质的齿轮/管道/活塞，外露的机械结构，蒸汽驱动的动力装置；
+  2. 色彩：复古金属色调（黄铜色/铁锈红/深棕色），做旧的氧化质感，暗黄色的蒸汽光晕；
+  3. 光影：暖黄色的煤油灯/蒸汽光效，金属反光的高光，机械缝隙的阴影层次；
+  4. 材质：做旧的金属锈迹，皮革的纹理，木质的纹路，玻璃罩的通透与划痕；
+  5. 风格：维多利亚时代美学+工业革命机械，复古与机械混搭，细节繁复但布局有序，蒸汽烟雾的朦胧效果。`
+  };
 
-    this.openai = new OpenAI({
-      baseURL: process.env.ARK_API_BASE || 'https://ark.cn-beijing.volces.com/api/v3',
-      apiKey: apiKey,
-    });
+// 核心：图生图（和官网效果一致）
+export async function generateImageFromSketch({
+  imageBase64,
+  prompt,
+  style = "realistic",
+  size = "2K"
+}) {
+  // 修复：变量名完全匹配
+  const selectedStylePrompt = stylePrompts[style] || stylePrompts.realistic;
+  const finalPrompt = `${prompt}，${selectedStylePrompt}`;
 
-    this.model = process.env.DOUBAO_MODEL || 'doubao-seedream-5-0-260128';
-    this.styleConfigs = STYLE_CONFIGS;
+  console.log("✅ 图生图调用中，参考图已传递");
 
-    console.log('✅ 豆包客户端已初始化');
-    console.log(`   模型: ${this.model}`);
-    console.log(`   支持风格数: ${Object.keys(this.styleConfigs).length}`);
-  }
+  const response = await client.images.generate({
+    model: "doubao-seedream-5-0-260128",
+    prompt: finalPrompt,
+    size: size,
+    response_format: "url",
+    image: imageBase64,
+    watermark: false
+  });
 
-  /**
-   * 获取所有支持的风格
-   */
-  getStyles() {
-    return Object.entries(this.styleConfigs).map(([id, config]) => ({
-      id,
-      name: config.name,
-      emoji: config.emoji,
-    }));
-  }
-
-  /**
-   * 格式化提示词
-   * @param {string} userPrompt - 用户输入的提示词
-   * @param {string} style - 艺术风格
-   * @returns {string} 格式化后的提示词
-   */
-  formatPrompt(userPrompt, style) {
-    const styleConfig = this.styleConfigs[style];
-    if (!styleConfig) {
-      console.warn(`⚠️ 未知风格: ${style}，使用默认风格`);
-      return userPrompt;
-    }
-
-    // 组合用户提示词和风格描述
-    return `${userPrompt}，${styleConfig.prompt}`;
-  }
-
-  /**
-   * 生成单张图片
-   * @param {string} prompt - 图片提示词
-   * @param {string} size - 图片尺寸 (1920x1920, 2K, 4K)
-   * @param {boolean} watermark - 是否添加水印
-   * @returns {Promise<Object>} 生成结果
-   */
-  async generateImage(prompt, size = '2K', watermark = false) {
-    try {
-      // 验证输入
-      if (!prompt || typeof prompt !== 'string') {
-        throw new Error('❌ prompt 必须是非空字符串');
-      }
-
-      if (prompt.length > 2000) {
-        throw new Error('❌ prompt 长度不能超过 2000 字符');
-      }
-
-      const validSizes = ['1920x1920', '2K', '4K'];
-      if (!validSizes.includes(size)) {
-        throw new Error(`❌ 无效的尺寸，支持: ${validSizes.join(', ')}`);
-      }
-
-      console.log(`\n🖼️ 豆包图片生成请求`);
-      console.log(`   提示词: ${prompt.substring(0, 60)}${prompt.length > 60 ? '...' : ''}`);
-      console.log(`   尺寸: ${size}`);
-      console.log(`   水印: ${watermark ? '是' : '否'}`);
-
-      const response = await this.openai.images.generate({
-        model: this.model,
-        prompt: prompt,
-        size: size,
-        response_format: 'url',
-        extra_body: {
-          watermark: watermark,
-        },
-      });
-
-      if (!response.data || !response.data[0]) {
-        throw new Error('❌ API 未返回有效的图片数据');
-      }
-
-      const imageUrl = response.data[0].url;
-      console.log(`✅ 图片生成成功`);
-      console.log(`   URL: ${imageUrl.substring(0, 80)}...`);
-
-      return {
-        image_url: imageUrl,
-        model: this.model,
-        size: size,
-        watermark: watermark,
-        timestamp: new Date().toISOString(),
-      };
-    } catch (error) {
-      console.error('❌ 豆包 API 错误:', error.message);
-
-      if (error.status === 401) {
-        throw new Error('❌ API Key 无效或已过期 - 请检查 ARK_API_KEY');
-      }
-      if (error.status === 429) {
-        throw new Error('⏱️ 请求过于频繁，请稍后重试（速率限制）');
-      }
-      if (error.code === 'ECONNREFUSED') {
-        throw new Error('❌ 无法连接到豆包 API，请检查网络连接');
-      }
-
-      throw new Error(`图片生成失败: ${error.message}`);
-    }
-  }
-
-  /**
-   * 批量生成图片
-   * @param {Array<string>} prompts - 提示词数组
-   * @param {string} size - 图片尺寸
-   * @param {boolean} watermark - 是否添加水印
-   * @returns {Promise<Array>} 生成结果数组
-   */
-  async batchGenerateImages(prompts, size = '2K', watermark = false) {
-    if (!Array.isArray(prompts) || prompts.length === 0) {
-      throw new Error('❌ prompts 必须是非空数组');
-    }
-
-    if (prompts.length > 10) {
-      throw new Error('❌ 单次最多生成 10 张图片');
-    }
-
-    console.log(`\n🎨 批量生成 ${prompts.length} 张图片...`);
-
-    const results = [];
-    for (let i = 0; i < prompts.length; i++) {
-      try {
-        console.log(`   [${i + 1}/${prompts.length}] 生成中...`);
-        const result = await this.generateImage(prompts[i], size, watermark);
-        results.push({
-          index: i + 1,
-          prompt: prompts[i],
-          ...result,
-          success: true,
-        });
-
-        // 避免速率限制，请求间隔 1 秒
-        if (i < prompts.length - 1) {
-          await new Promise((resolve) => setTimeout(resolve, 1000));
-        }
-      } catch (error) {
-        console.error(`   [${i + 1}/${prompts.length}] 生成失败: ${error.message}`);
-        results.push({
-          index: i + 1,
-          prompt: prompts[i],
-          success: false,
-          error: error.message,
-        });
-      }
-    }
-
-    const succeeded = results.filter((r) => r.success).length;
-    console.log(`✅ 批量生成完成 - 成功: ${succeeded}/${prompts.length}`);
-
-    return results;
-  }
-
-  /**
-   * 根据风格生成图片
-   * @param {string} userPrompt - 用户提示词
-   * @param {string} style - 风格ID
-   * @param {string} size - 图片尺寸
-   * @returns {Promise<Object>} 生成结果
-   */
-  async generateImageWithStyle(userPrompt, style = 'realistic', size = '2K') {
-    const formattedPrompt = this.formatPrompt(userPrompt, style);
-    return this.generateImage(formattedPrompt, size);
-  }
-
-  /**
-   * 获取模型信息
-   */
-  getModelInfo() {
-    return {
-      model: this.model,
-      capabilities: {
-        text_to_image: true,
-        batch_generation: true,
-        watermark_support: true,
-        styles_count: Object.keys(this.styleConfigs).length,
-      },
-      supportedSizes: ['1920x1920', '2K', '4K'],
-    };
-  }
+  return response.data[0]?.url;
 }
 
-export default new DoubaoService();
+export default {
+  generateImageFromSketch
+};
