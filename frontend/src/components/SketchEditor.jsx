@@ -223,7 +223,6 @@ export default function SketchEditor() {
             <div className="config-item">
               <label>图片尺寸</label>
               <select value={size} onChange={(e) => setSize(e.target.value)}>
-
                 <option value="2K">2K (推荐)</option>
               </select>
             </div>
