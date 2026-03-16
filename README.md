@@ -50,7 +50,7 @@ https://qiansuo.top
 
 步骤1：克隆代码
 
-git clone https://gitee.com/你的用户名/sketch-to-image.git
+git clone https://gitee.com/NoOneAhead/sketch-to-image.git
 cd sketch-to-image
 
 步骤2：部署后端（Node.js/Express）
