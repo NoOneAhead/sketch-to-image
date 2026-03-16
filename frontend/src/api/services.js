@@ -65,41 +65,46 @@ export async function generateImage(prompt, style, size) {
 }
 
 /**
- * 从草图生成图片 (通过豆包视觉识别)
- * @param {string} sketch_base64 - Base64 编码的草图
- * @param {string} user_description - 用户的补充描述
- * @param {string} style - 风格
- * @param {string} size - 尺寸
- * @returns {Promise<Object>}
+ * 从草图生成图片（适配v3接口）
+ * @param {string} sketchBase64 - 草图Base64
+ * @param {string} userDescription - 用户描述
+ * @param {string} style - 选中的风格
+ * @param {string} size - 图片尺寸
+ * @param {Array<string>} selectedStyles - 风格数组
+ * @returns {Promise<Object>} 生成结果
  */
-export async function generateImageFromSketch(sketch_base64, user_description, style, size) {
+export const generateImageFromSketch = async (
+  sketchBase64,
+  userDescription = '',
+  style = 'realistic',
+  size = '2K'
+) => {
   try {
     const response = await axios.post(`${API_BASE_URL}/images/generate-from-sketch-v3`, {
-      sketch_base64,
-      user_description,
-      style,
-      size,
+      sketch_base64: sketchBase64,
+      user_description: userDescription,
+      style: style,
+      size: size
+    }, {
+      headers: { 'Content-Type': 'application/json' },
+      timeout: 60000 // 图生图耗时较长，超时设为60秒
     });
-    return response.data.data;
-  } catch (error) {
-    console.error('从草图生成图片失败:', error);
-    throw new Error(error.response?.data?.error || '生成图片失败');
-  }
-}
 
-/**
- * 仅识别草图特征
- * @param {string} sketch_base64 - Base64 编码的草图
- * @returns {Promise<Object>}
- */
-export async function recognizeSketchFeatures(sketch_base64) {
-  try {
-    const response = await axios.post(`${API_BASE_URL}/images/recognize-sketch`, {
-      sketch_base64,
-    });
-    return response.data.data;
+    if (!response.data || !response.data.image_url) {
+      throw new Error('后端返回格式异常，未找到image_url');
+    }
+
+    return response.data;
   } catch (error) {
-    console.error('识别草图失败:', error);
-    throw new Error(error.response?.data?.error || '识别草图失败');
+    let errorMsg = '图生图生成失败';
+    if (error.response) {
+      errorMsg += `: ${error.response.status} - ${error.response.data.message}`;
+    } else if (error.request) {
+      errorMsg += ': 后端服务未响应，请检查服务是否启动';
+    } else {
+      errorMsg += `: ${error.message}`;
+    }
+    console.error(errorMsg);
+    throw new Error(errorMsg);
   }
-}
+};
