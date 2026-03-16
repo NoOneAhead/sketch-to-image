@@ -1,7 +1,5 @@
 import { useState, useEffect } from 'react';
 import {
-  getStyles,
-  getImageSizes,
   healthCheck,
 } from './api/services';
 import SketchEditor from './components/SketchEditor';
@@ -19,12 +17,7 @@ export default function App() {
       try {
         const isHealthy = await healthCheck();
         setApiStatus(isHealthy);
-
         if (isHealthy) {
-          const [stylesData, sizesData] = await Promise.all([
-            getStyles(),
-            getImageSizes(),
-          ]);
         } else {
           setError('⚠️ 后端服务未启动');
         }
@@ -45,7 +38,7 @@ export default function App() {
   return (
     <div className="app">
       <header className="header">
-        <h1>🎨 AI 创意生成器</h1>
+        <h1>🎨 绘创 AI - 草图创意生成器</h1>
         <div className="header-right">
           <span className={`status ${apiStatus ? 'ok' : 'error'}`}>
             {apiStatus ? '✅ 已连接' : '❌ 未连接'}
@@ -67,10 +60,6 @@ export default function App() {
           </section>
         </div>
       </main>
-
-      <footer className="footer">
-        <p>🚀 由豆包 AI 模型驱动 | 支持文字生成和草图转图 | 高质量图片生成</p>
-      </footer>
     </div>
   );
 }
