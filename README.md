@@ -1,306 +1,115 @@
-# 🎨 智能草图转图像系统
+AI创意生成器（sketch-to-image）
 
-一个基于人工智能的创新应用，可以将你手绘的草图转换成高质量的AI生成图像。使用先进的计算机视觉和生成式AI技术，让创意无限可能。
+一款基于AI的草图生成工具，支持手绘草图快速转化为创意图片，采用「前端Vercel部署+后端Render部署+阿里云域名绑定」架构，国内可正常访问，无需复杂配置即可上手使用。
 
-## ✨ 主要功能
+🎯 项目简介
 
-### 1. **草图绘制** 📝
-- 直观的在线画布编辑器
-- 可调节笔刷大小（1-20px）
-- 自定义笔刷颜色
-- 实时绘制预览
-- 一键清空画布
+AI创意生成器（sketch-to-image）核心功能是「手绘草图→AI创意生成」，用户只需绘制简单的线条草图，选择风格、输入描述，即可快速生成高质量、有创意的图片，适配个人创意设计、手账制作、产品原型预览等场景。
 
-### 2. **AI识别特征** 🔍
-- 自动识别草图中的物体和场景
-- 生成详细的图像描述
-- 展示识别置信度
-- 支持用户编辑和完善描述
+✅ 核心优势：
 
-### 3. **智能图像生成** 🖼️
-- 多种艺术风格选择：
-  - 📸 写实风格
-  - 🎭 卡通风格
-  - 🎨 水彩风格
-  - 🖌️ 油画风格
-  - ✨ 奇幻风格
-  - 🤖 赛博朋克风格
-- 多种分辨率选项：
-  - 1920×1920（标准）
-  - 2K（推荐）
-  - 4K（高清）
-- 图像下载功能
+- 极简操作：手绘草图即可生成，无需专业设计能力
 
-## 🎯 使用流程
+- 多风格支持：涵盖超写实、卡通、赛博朋克、水彩等多种风格
 
-```
-1️⃣ 绘制草图 → 2️⃣ 识别特征 → 3️⃣ 生成图像
-```
+- 国内可访问：基于Vercel+Render+阿里云域名，搭配优化配置，国内访问稳定
 
-三个步骤可随时切换，流程灵活，用户体验友好。
+- 开源可扩展：代码结构清晰，可轻松扩展新风格、新功能
 
-## 🚀 快速开始
+🌐 在线访问
 
-### 前置条件
-- Node.js 18+ 
-- npm 或 yarn
-- 现代浏览器（Chrome、Firefox、Safari、Edge）
+直接访问部署好的在线版本，无需本地部署：
 
-### 本地开发安装
+https://qiansuo.top
 
-#### 1. 克隆项目
-```bash
-git clone https://github.com/YOUR_USERNAME/sketch-to-image.git
+🚀 快速使用
+
+1. 访问 https://qiansuo.top，进入手绘页面；
+
+2. 使用左侧手绘工具，绘制简单草图（如杯子、人物、风景等）；
+
+3. 选择生成风格，输入创意描述（如「超写实风格，透明玻璃材质，光影细腻」）；
+
+4. 点击「生成图片」，等待3-10秒，即可获得AI生成的创意作品；
+
+5. 生成完成后，可下载作品、重新绘制或调整参数再次生成。
+
+🔧 本地部署（可选）
+
+若需本地开发或二次开发，可按以下步骤部署：
+
+前置依赖
+
+- Node.js 16+
+
+- npm / yarn
+
+- Git
+
+- 火山方舟 ARK_API_KEY（用于AI生成，需自行申请）
+
+步骤1：克隆代码
+
+git clone https://gitee.com/你的用户名/sketch-to-image.git
 cd sketch-to-image
-```
 
-#### 2. 安装依赖
-```bash
-# 安装前端依赖
+步骤2：部署后端（Node.js/Express）
+
+# 进入后端目录
+cd backend
+
+# 安装依赖
 npm install
 
-# 如果需要，安装后端依赖
-cd server
-npm install
-cd ..
-```
-
-#### 3. 配置环境变量
-
-创建 `.env.local` 文件（前端）：
-```env
-VITE_API_URL=http://localhost:5000
-```
-
-创建 `server/.env` 文件（后端）：
-```env
-PORT=5000
-DOUBAO_API_KEY=your_api_key_here
-```
-
-> 获取 `DOUBAO_API_KEY`：访问 [豆包官网](https://www.doubao.com) 申请 API 密钥
-
-#### 4. 启动开发服务器
-
-**终端1 - 启动后端：**
-```bash
-cd server
-npm start
-```
-
-**终端2 - 启动前端：**
-```bash
-npm run dev
-```
-
-#### 5. 访问应用
-打开浏览器访问：[http://localhost:5173](http://localhost:5173)
-
-## 🌐 线上部署
-
-### 使用 Vercel + Render 部署（推荐）
-
-#### 前端部署到 Vercel
-
-1. 将代码推送到 GitHub
-2. 访问 [vercel.com](https://vercel.com)
-3. 导入你的 GitHub 仓库
-4. 配置环境变量：
-   ```
-   VITE_API_URL=https://your-backend-url.onrender.com
-   ```
-5. 点击 Deploy
-
-#### 后端部署到 Render
-
-1. 访问 [render.com](https://render.com)
-2. 创建新的 Web Service
-3. 连接你的 GitHub 仓库
-4. 配置构建和启动命令：
-   - Build Command: `npm install`
-   - Start Command: `npm start`
-5. 添加环境变量（DOUBAO_API_KEY）
-6. 点击 Deploy
-
-详细步骤见 [部署指南](./DEPLOYMENT.md)
-
-## 📋 项目结构
-
-```
-sketch-to-image/
-├── src/                          # 前端源代码
-│   ├── components/
-│   │   ├── SketchEditor.jsx      # 草图编辑器组件
-│   │   └── App.jsx               # 主应用组件
-│   ├── api/
-│   │   └── services.js           # API 调用服务
-│   ├── styles/
-│   │   ├── App.css               # 应用样式
-│   │   └── SketchEditor.css      # 编辑器样式
-│   └── main.jsx                  # 入口文件
-├── server/                       # 后端源代码
-│   ├── server.js                 # 服务器主文件
-│   ├── routes/
-│   │   └── image.js              # 图像处理路由
-│   ├── services/
-│   │   ├── doubaoService.js      # 豆包 API 服务
-│   │   └── doubaoVisionService.js # 豆包视觉识别服务
-│   └── package.json
-├── package.json                  # 前端依赖配置
-└── README.md                     # 项目文档
-```
-
-## 🛠️ 技术栈
-
-### 前端
-- **React 18** - UI 框架
-- **Vite** - 构建工具
-- **CSS3** - 样式处理
-- **Fetch API** - HTTP 请求
-
-### 后端
-- **Node.js** - 运行时环境
-- **Express.js** - Web 框架
-- **CORS** - 跨域资源共享
-- **豆包 API** - AI 模型服务
-
-## 🔑 API 集成
-
-### 豆包 (Doubao) API
-
-本项目使用豆包的两个主要 API：
-
-1. **图像理解 API** - 识别草图中的物体和场景
-2. **图像生成 API** - 根据描述生成高质量图像
-
-[豆包官方文档](https://www.doubao.com/docs)
-
-## 📸 功能截图
-
-### 步骤 1: 绘制草图
-- 清晰的画布编辑界面
-- 实时笔刷预览
-- 调节笔刷参数
-
-### 步骤 2: 识别特征
-- AI 自动识别物体
-- 显示识别详情
-- 用户可编辑描述
-
-### 步骤 3: 生成图像
-- 选择艺术风格
-- 选择图像分辨率
-- 下载生成的图像
-
-## ⚙️ 配置选项
-
-### 笔刷大小
-- 范围：1-20 像素
-- 实时调整
-
-### 笔刷颜色
-- 支持所有 RGB 颜色
-- 颜色选择器选择
-
-### 图像风格
-- 写实、卡通、水彩、油画、奇幻、赛博朋克
-
-### 图像分辨率
-- 1920×1920（标准）
-- 2K（推荐）
-- 4K（高清）
-
-## 🐛 故障排除
-
-### 问题1：后端无法连接
-**解决方案：**
-- 检查后端服务是否正在运行
-- 确认 `VITE_API_URL` 环境变量设置正确
-- 检查防火墙设置
-
-### 问题2：图像识别失败
-**解决方案：**
-- 确保 `DOUBAO_API_KEY` 有效
-- 检查 API 配额是否充足
-- 查看浏览器控制台错误信息
-
-### 问题3：CORS 错误
-**解决方案：**
-- 确保后端已启用 CORS
-- 检查 `server.js` 中的 CORS 配置
-
-### 问题4：Canvas 绘制无反应
-**解决方案：**
-- 刷新页面
-- 清除浏览器缓存
-- 尝试使用其他浏览器
-
-## 📝 环境变量说明
-
-### 前端 (.env.local)
-```env
-# API 服务器地址
-VITE_API_URL=http://localhost:5000  # 开发环境
-VITE_API_URL=https://api.example.com # 生产环境
-```
-
-### 后端 (.env)
-```env
-# 服务器端口
-PORT=5000
-
-# 豆包 API 密钥
-DOUBAO_API_KEY=your_api_key_here
-
-# 可选：其他配置
+# 配置环境变量
+# 新建 .env 文件，添加以下内容
+ARK_API_KEY=你的火山方舟API密钥
 NODE_ENV=development
-```
+ALLOWED_ORIGINS=http://localhost:5173
+PORT=5000
 
-## 🎓 学习资源
+# 启动本地后端服务
+npm run dev
+# 启动成功后，后端地址：http://localhost:5000
 
-- [React 官方文档](https://react.dev)
-- [Vite 官方文档](https://vitejs.dev)
-- [Express.js 官方文档](https://expressjs.com)
-- [豆包 API 文档](https://www.doubao.com/docs)
+步骤3：部署前端（Vite/React/Vue）
 
-## 📄 许可证
+# 回到项目根目录，进入前端目录
+cd ../frontend
 
-MIT License - 详见 [LICENSE](./LICENSE) 文件
+# 安装依赖
+npm install
 
-## 🤝 贡献指南
+# 配置环境变量
+# 新建 .env 文件，添加以下内容
+VITE_API_URL=http://localhost:5000
 
-欢迎提交 Issue 和 Pull Request！
+# 启动本地前端服务
+npm run dev
+# 启动成功后，访问：http://localhost:5173
 
-### 贡献步骤：
-1. Fork 本仓库
-2. 创建特性分支 (`git checkout -b feature/AmazingFeature`)
-3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
-4. 推送到分支 (`git push origin feature/AmazingFeature`)
-5. 创建 Pull Request
+📌 注意事项
 
-## 👨‍💻 作者
+- .env 文件包含敏感信息（API密钥），已添加到 .gitignore，请勿提交到仓库；
 
-**Your Name** - [@YourGitHub](https://github.com/NoOneAhead)
+- 线上部署后，修改环境变量需重新部署对应服务（Vercel/Render）；
 
+- 火山方舟API有调用额度限制，若生成失败，可检查API额度或更换密钥；
 
-## 🙏 致谢
+✨ 功能扩展建议
 
-感谢以下项目和服务的支持：
-- [React](https://react.dev)
-- [Vite](https://vitejs.dev)
-- [Express.js](https://expressjs.com)
-- [豆包 AI](https://www.doubao.com)
+- 新增风格库：添加更多小众风格（如古风、像素、肌理风）；
 
-## 📊 项目统计
+- 草图辅助：增加网格线、形状辅助、图层管理功能；
 
-[![GitHub stars](https://img.shields.io/github/stars/NoOneAhead/sketch-to-image?style=flat-square)](https://github.com/NoOneAhead/sketch-to-image/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/NoOneAhead/sketch-to-image?style=flat-square)](https://github.com/NoOneAhead/sketch-to-image/network)
-[![GitHub issues](https://img.shields.io/github/issues/NoOneAhead/sketch-to-image?style=flat-square)](https://github.com/NoOneAhead/sketch-to-image/issues)
-[![License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](./LICENSE)
+- 作品管理：添加收藏、批量下载、分享功能；
 
----
+- 参数优化：增加创意度调节、分辨率调节功能。
 
-**⭐ 如果这个项目对你有帮助，请给个 Star！**
+📞 反馈与支持
 
-**🚀 祝你使用愉快！**
-"""
+若使用过程中遇到问题，或有功能建议，可通过以下方式反馈：
+
+- Gitee仓库：https://gitee.com/NoOneAhead/sketch-to-image（提交Issues）
+
+感谢使用 AI创意生成器，祝您创作愉快！ 🎨
