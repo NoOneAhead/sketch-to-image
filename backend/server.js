@@ -11,7 +11,7 @@ app.use(cors({
   origin: [
     'http://localhost:3000',
     'http://localhost:5173',
-    'https://sketch-to-image-backend.onrender.com'  // 替换为你的前端地址
+    'https://sketch-to-image-liart.vercel.app'  // 替换为你的前端地址
   ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
