@@ -8,8 +8,6 @@ import './App.css';
 export default function App() {
   const [error, setError] = useState('');
   const [apiStatus, setApiStatus] = useState(false);
-  const [mode] = useState('sketch'); 
-  const [sketchImage, setSketchImage] = useState(null);
 
   // 初始化
   useEffect(() => {
@@ -29,35 +27,16 @@ export default function App() {
     initialize();
   }, []);
 
-  // 处理草图
-  const handleSketchGenerated = (sketchData) => {
-    setSketchImage(sketchData);
-  };
-
-
   return (
     <div className="app">
-      <header className="header">
-        <h1>🎨 绘创 AI - 草图创意生成器</h1>
-        <div className="header-right">
-          <span className={`status ${apiStatus ? 'ok' : 'error'}`}>
-            {apiStatus ? '✅ 已连接' : '❌ 未连接'}
-          </span>
-        </div>
-      </header>
-
       <main className="container">
         <div className="layout">
-          {/* 中央/右侧：内容区 */}
-          <section className="content-section">
-            {/* 草图模式：显示编辑器 */}
-            {mode === 'sketch' && (
-              <div className="sketch-section">
-                <SketchEditor onSketchGenerated={handleSketchGenerated} />
-
-              </div>
-            )}
-          </section>
+            <SketchEditor />
+            <div className="header">
+              <span className={`status ${apiStatus ? 'ok' : 'error'}`}>
+                {apiStatus ? '✅ 已连接' : '❌ 未连接'}
+              </span>
+            </div>
         </div>
       </main>
     </div>
