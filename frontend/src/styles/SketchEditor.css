@@ -1,479 +1,92 @@
-/* 全局基础变量（对齐 App.css 变量体系） */
-:root {
-  --primary: #667eea;
-  --primary-dark: #5a67d8;
-  --secondary: #764ba2;
-  --success: #4caf50;
-  --danger: #f44336;
-  --gray-100: #f1f5f9;
-  --gray-200: #e2e8f0;
-  --gray-300: #cbd5e1;
-  --gray-600: #475569;
-  --gray-800: #1e293b;
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
-  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.12);
-  --transition: all 0.3s ease;
-  /* 补充 App.css 依赖的变量，避免未定义 */
-  --color-primary: var(--primary);
-  --color-success: var(--success);
-  --color-error: var(--danger);
-  --color-gray-border: var(--gray-200);
-  --transition-base: var(--transition);
-  --gradient-primary: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-}
-
-/* 编辑器外层容器（对齐 App.css 布局/间距） */
 .sketch-editor {
-  background: white;
-  border-radius: var(--radius-lg);
-  padding: 24px;
-  box-shadow: var(--shadow-md);
-  max-width: 1800px; /* 和 App.css .layout/.header 最大宽度对齐 */
-  width: 100%;
-  margin: 0 auto;
-  box-sizing: border-box;
-  overflow: hidden;
-}
-
-.editor-header {
-  margin-bottom: 24px;
-  text-align: center;
-}
-
-.editor-header h3 {
-  font-size: 24px;
-  margin-bottom: 8px;
-  color: var(--gray-800);
-  font-weight: 700;
+  margin: auto;
 }
 
 .editor-header .tip {
-  font-size: 14px;
-  color: var(--gray-600);
-  margin: 0;
-  line-height: 1.5;
+  text-align: center;
+  font-size: 20px;
+  color: #666;
 }
 
-/* 进度指示（适配宽容器） */
-.progress-steps {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 40px;
-  margin-bottom: 24px;
-  padding: 16px 24px;
-  background: linear-gradient(135deg, #f5f7fa 0%, #e4eaf5 100%);
-  border-radius: var(--radius-md);
-  position: relative;
-  max-width: 1000px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.progress-steps::before {
-  content: "";
-  position: absolute;
-  top: 22px;
-  left: 100px;
-  right: 100px;
-  height: 2px;
-  background: var(--gray-300);
-  z-index: 1;
-}
-
-.step {
+.sketch-steps-container {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  transition: var(--transition);
-  position: relative;
-  z-index: 2;
-  min-width: 100px;
 }
 
-.step-circle {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 600;
-  font-size: 18px;
-  background: var(--gray-200);
-  color: var(--gray-600);
-  border: 2px solid var(--gray-300);
-  transition: var(--transition);
-}
-
-.step.active .step-circle {
-  background: var(--primary);
-  color: white;
-  border-color: var(--primary);
-  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15);
-}
-
-.step.done .step-circle {
-  background: var(--success);
-  color: white;
-  border-color: var(--success);
-}
-
-.step p {
-  font-size: 14px;
-  font-weight: 600;
-  margin: 0;
-  color: var(--gray-600);
-  white-space: nowrap;
-}
-
-.step.active p {
-  color: var(--primary);
-}
-
-.step-line {
-  width: 40px;
-  height: 2px;
-  background: var(--gray-300);
-  z-index: 1;
-}
-
-/* 三步骤容器（重命名避免冲突，核心布局保留） */
-.sketch-steps-container {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr); /* 严格三列等宽 */
-  gap: 30px; /* 增大列间距，避免拥挤 */
-  margin-top: 16px;
-  width: 100%;
-  height: calc(100vh - 200px); /* 利用视口高度，让面板占满屏幕 */
-  min-height: 600px; /* 最低高度，保证画布足够大 */
-}
-
-/* 每个步骤面板（对齐 App.css 内边距/样式） */
 .step-panel {
-  background: var(--gray-100);
-  border-radius: var(--radius-md);
-  padding: 20px 24px; /* 对齐 App.css .step-item 内边距 */
-  border: 1px solid var(--gray-200);
-  transition: var(--transition);
-  width: 100%;
-  height: 100%; /* 占满父容器高度 */
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column; /* 内部垂直布局，画布自动占高 */
-}
-
-.step-panel:hover:not(.disabled) {
-  border-color: var(--primary);
-  box-shadow: var(--shadow-sm);
-  transform: translateY(-2px);
-}
-
-.step-panel.disabled {
-  opacity: 0.6;
-  pointer-events: none;
-  background: #fafafa;
+  background: #f9f9f9be;
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid #a7a7a7;
 }
 
 .step-title {
   font-size: 18px;
-  margin-bottom: 20px;
-  color: var(--gray-800);
+  margin-bottom: 12px;
   text-align: center;
-  padding-bottom: 12px;
-  border-bottom: 1px solid var(--gray-200);
-  font-weight: 600;
-  flex-shrink: 0; /* 标题不收缩 */
 }
 
-/* 工具栏（紧凑布局，不占过多高度） */
-.editor-toolbar {
+.tool-group {
+  margin-bottom: 12px;
+}
+
+.tool-grid {
   display: flex;
-  gap: 12px;
-  align-items: center;
-  margin-bottom: 20px;
-  padding: 12px 16px;
-  background: linear-gradient(135deg, #f5f7fa 0%, #e4eaf5 100%);
-  border-radius: var(--radius-md);
   flex-wrap: wrap;
-  flex-shrink: 0; /* 工具栏不收缩 */
-}
-
-.toolbar-item {
-  display: flex;
-  align-items: center;
   gap: 8px;
+  margin-bottom: 12px;
 }
 
-.toolbar-item label {
-  font-weight: 600;
-  font-size: 13px;
-  color: var(--gray-800);
-  min-width: 60px;
-}
-
-.slider {
-  width: 120px;
-  height: 6px;
-  cursor: pointer;
-  accent-color: var(--primary);
-}
-
-.toolbar-item .value {
-  font-size: 12px;
-  color: var(--gray-600);
-  min-width: 36px;
-}
-
-.color-picker {
-  width: 40px;
-  height: 36px;
-  border: 1px solid var(--gray-300);
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  padding: 0;
-}
-
-.toolbar-buttons {
-  display: flex;
-  gap: 8px;
-  margin-left: auto;
-}
-
-.btn-tool {
-  padding: 8px 14px;
+.tool-btn {
+  padding: 8px 10px;
+  border-radius: 8px;
   border: none;
-  border-radius: var(--radius-sm);
-  font-weight: 600;
+  background: #f1f1f1;
   font-size: 12px;
   cursor: pointer;
-  transition: var(--transition);
-  white-space: nowrap;
 }
 
-.btn-clear {
-  background: var(--danger);
+.tool-btn.active {
+  background: #0077ff;
   color: white;
 }
 
-.btn-clear:hover {
-  background: #d32f2f;
-  transform: translateY(-1px);
+.tool-settings {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  margin-bottom: 12px;
 }
 
-.btn-save {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-  color: white;
-}
-
-.btn-save:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
-}
-
-/* 画布（核心：最大化高度，占满面板剩余空间） */
 .sketch-canvas {
   width: 100%;
-  flex-grow: 1; /* 关键：占满面板所有剩余高度 */
-  min-height: 100px; /* 最低高度，保证绘制区域足够大 */
-  border: 2px solid var(--gray-200);
-  border-radius: var(--radius-md);
-  background: white;
+  height: 460px;
+  background: rgb(255, 255, 255);
+  touch-action: none !important;
+  -webkit-user-select: none;
+  user-select: none;
   cursor: crosshair;
-  display: block;
-  box-shadow: var(--shadow-sm);
-  transition: var(--transition);
 }
 
-.sketch-canvas:hover {
-  border-color: var(--primary);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
-}
-
-/* 按钮通用样式（对齐 App.css 渐变/样式） */
-.btn-next, .btn-download {
-  padding: 12px 24px;
-  border: none;
-  border-radius: var(--radius-sm);
-  font-weight: 600;
-  font-size: 14px;
-  cursor: pointer;
-  transition: var(--transition);
+.btn-confirm, .btn-generate {
   width: 100%;
-  margin-top: 20px;
-  background: var(--gradient-primary); /* 对齐 App.css 渐变变量 */
-  color: white;
-  flex-shrink: 0; /* 按钮不收缩 */
-}
-
-.btn-next:hover:not(:disabled) {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
-}
-
-.btn-next:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.btn-download {
-  background: var(--success);
-}
-
-/* 分析面板/生成配置（适配高度） */
-.analysis-panel, .generation-config {
-  flex-grow: 1; /* 占满面板剩余高度 */
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  overflow-y: auto; /* 内容过多时滚动，不挤压画布 */
-}
-
-.analysis-item {
-  background: white;
   padding: 12px;
-  border-radius: var(--radius-sm);
-  border-left: 3px solid var(--primary);
-  font-size: 14px;
+  margin-top: 12px;
+  background: #0077ff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
 }
 
-.result-image img {
-  max-width: 100%;
-  max-height: 400px; /* 增大生成图片显示高度 */
-  border-radius: var(--radius-sm);
-  box-shadow: var(--shadow-sm);
-  margin: 0 auto;
-  display: block;
+.disabled {
+  opacity: 0.5;
+  pointer-events: none;
 }
 
-/* 错误提示 */
-.error-message {
-  margin-top: 16px;
-  padding: 10px 12px;
-  background: #ffebee;
-  color: #c62828;
-  border-radius: var(--radius-sm);
-  border-left: 3px solid var(--danger);
-  font-size: 13px;
+.error {
+  color: red;
   text-align: center;
-  flex-shrink: 0;
-}
-
-/* 响应式适配（对齐 App.css 断点） */
-@media (max-width: 1400px) {
-  .sketch-steps-container {
-    min-height: 500px;
-  }
-  .sketch-canvas {
-    min-height: 380px;
-  }
-}
-
-/* 平板端（强制降级为两列+单列，对齐 App.css 1024px 断点） */
-@media (max-width: 1024px) {
-  .sketch-steps-container {
-    grid-template-columns: 1fr 1fr;
-    height: auto;
-    min-height: unset;
-  }
-  .step-panel:last-child {
-    grid-column: 1 / -1;
-    max-width: 800px;
-    margin: 0 auto;
-  }
-  .sketch-canvas {
-    min-height: 300px;
-  }
-  /* 对齐 App.css 响应式内边距 */
-  .sketch-editor {
-    padding: 16px;
-  }
-  .step-panel {
-    padding: 16px 20px;
-  }
-}
-
-/* 手机端（对齐 App.css 768px 断点） */
-@media (max-width: 768px) {
-  .sketch-steps-container {
-    grid-template-columns: 1fr;
-  }
-  .sketch-canvas {
-    min-height: 250px;
-  }
-  .step-panel {
-    padding: 16px 20px; /* 对齐 App.css .step-item 手机端内边距 */
-  }
-  .editor-header h3 {
-    font-size: 20px;
-  }
-}
-
-/* 风格特征提示文本 */
-.style-feature-tip {
-  margin: 8px 0 0 0;
-  padding: 4px 8px;
-  background: #f5f5f5;
-  border-radius: 4px;
-  font-size: 16px;
-  color: #666;
-}
-
-/* 结果面板中的风格特征展示 */
-.result-info p {
-  margin: 4px 0;
-  font-size: 14px;
-}
-
-/* 补充描述文本框样式（核心修改） */
-.config-item textarea {
-  width: 100%; /* 占满父容器宽度，最关键的设置 */
-  min-width: 300px; /* 保底宽度，防止过窄 */
-  padding: 10px 12px;
-  border: 1px solid var(--gray-300);
-  border-radius: var(--radius-sm);
-  font-size: 14px;
-  line-height: 1.5;
-  resize: vertical; /* 允许用户仅垂直拉伸，保持宽度不变 */
-  box-sizing: border-box; /* 确保内边距不影响宽度 */
-}
-
-/* 补充：生成配置项的容器样式（确保父容器足够宽） */
-.generation-config .config-item {
-  margin-bottom: 16px;
-  width: 100%; /* 配置项容器占满面板宽度 */
-}
-
-.generation-config .config-item label {
-  display: block;
-  margin-bottom: 6px;
-  font-weight: 600;
-  font-size: 16px;
-  color: var(--gray-800);
-}
-
-/* 风格特征提示文本优化 */
-.style-feature-tip {
-  margin: 8px 0 0 0;
-  padding: 8px 12px;
-  background: #f5f5f5;
-  border-radius: 6px;
-  font-size: 16px;
-  color: #555;
-  line-height: 1.6;
-  white-space: pre-line; /* 保留换行符，让提示词分行展示 */
-  max-height: 200px; /* 限制最大高度，避免占太多空间 */
-  overflow-y: auto; /* 内容过多时滚动 */
-}
-
-/* 结果面板中的风格特征展示优化 */
-.result-info p {
-  margin: 8px 0;
-  font-size: 13px;
-  line-height: 1.6;
-  white-space: pre-line; /* 保留换行 */
+  margin-top: 8px;
 }
