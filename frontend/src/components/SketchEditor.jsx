@@ -340,7 +340,7 @@ export default function SketchEditor() {
   return (
     <div className="sketch-editor">
       <div className="editor-header">
-        <p className="tip">🎨 AI专业速写板（Pad/PC双端）</p>
+        <p className="tip">🎨 AI草图生成器（Pad/PC双端）</p>
       </div>
 
       <div className="sketch-steps-container">
