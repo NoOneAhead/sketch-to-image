@@ -24,25 +24,32 @@ export default function SketchEditor() {
   const [scale, setScale] = useState(1);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
+  // 固定 DPR，防止画布被重复放大
+  const FIXED_DPR = 1;
+
   // 初始化画布
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const rect = canvas.getBoundingClientRect();
-    const dpr = window.devicePixelRatio || 1;
-    canvas.width = rect.width * dpr;
-    canvas.height = rect.height * dpr;
+
+    canvas.width = rect.width * FIXED_DPR;
+    canvas.height = rect.height * FIXED_DPR;
+
     const ctx = canvas.getContext('2d');
-    ctx.scale(dpr, dpr);
+    ctx.scale(FIXED_DPR, FIXED_DPR);
+
     canvas.style.width = `${rect.width}px`;
     canvas.style.height = `${rect.height}px`;
+
     ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillRect(0, 0, rect.width, rect.height);
+
     setContext(ctx);
     saveHistory(ctx);
   }, []);
 
-  // 保存历史记录（撤销）
+  // 保存历史
   const saveHistory = (ctx) => {
     const canvas = canvasRef.current;
     const data = canvas.toDataURL('image/png');
@@ -58,33 +65,32 @@ export default function SketchEditor() {
     const img = new Image();
     img.src = history[historyIndex - 1];
     img.onload = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.drawImage(img, 0, 0);
-      // 关键修复：重置混合模式，避免后续绘制变淡
+      ctx.clearRect(0, 0, canvas.width / FIXED_DPR, canvas.height / FIXED_DPR);
+      ctx.drawImage(img, 0, 0, canvas.width / FIXED_DPR, canvas.height / FIXED_DPR);
       ctx.globalCompositeOperation = 'source-over';
       setHistoryIndex(historyIndex - 1);
     };
   };
 
-  // 获取坐标（兼容手机）
+  // 获取坐标
   const getPos = (e) => {
     const canvas = canvasRef.current;
     const rect = canvas.getBoundingClientRect();
     const ev = e.touches ? e.touches[0] : e;
     return {
-      x: (ev.clientX - rect.left) / scale,
-      y: (ev.clientY - rect.top) / scale,
+      x: ev.clientX - rect.left,
+      y: ev.clientY - rect.top,
     };
   };
 
-  // 不同笔刷的真实绘制逻辑
+  // 笔刷绘制
   const drawBrush = (ctx, pos) => {
     ctx.globalCompositeOperation = 'source-over';
     ctx.strokeStyle = brushColor;
     ctx.fillStyle = brushColor;
 
     switch (tool) {
-      case 'pencil': // 铅笔：硬边
+      case 'pencil':
         ctx.lineWidth = brushSize;
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
@@ -92,7 +98,7 @@ export default function SketchEditor() {
         ctx.stroke();
         break;
 
-      case 'sketch': // 素描：颗粒
+      case 'sketch':
         ctx.lineWidth = brushSize * 1.2;
         ctx.lineCap = 'round';
         ctx.globalAlpha = 0.4;
@@ -105,28 +111,28 @@ export default function SketchEditor() {
         }
         break;
 
-      case 'line': // 勾线：极细
+      case 'line':
         ctx.lineWidth = Math.max(1, brushSize * 0.4);
         ctx.lineCap = 'butt';
         ctx.globalAlpha = 1;
         ctx.stroke();
         break;
 
-      case 'soft': // 软毛笔：圆润
+      case 'soft':
         ctx.lineWidth = brushSize;
         ctx.lineCap = 'round';
         ctx.globalAlpha = 0.85;
         ctx.stroke();
         break;
 
-      case 'color': // 上色笔：实心
+      case 'color':
         ctx.lineWidth = brushSize;
         ctx.lineCap = 'square';
         ctx.globalAlpha = 1;
         ctx.stroke();
         break;
 
-      case 'crayon': // 蜡笔：纹理
+      case 'crayon':
         ctx.lineWidth = brushSize * 0.9;
         ctx.lineCap = 'round';
         ctx.globalAlpha = 0.6;
@@ -139,14 +145,14 @@ export default function SketchEditor() {
         }
         break;
 
-      case 'ink': // 墨水笔
+      case 'ink':
         ctx.lineWidth = brushSize;
         ctx.lineCap = 'round';
         ctx.globalAlpha = 1;
         ctx.stroke();
         break;
 
-      case 'spray': // 喷漆：大圆点、高浓度、边缘锐利
+      case 'spray':
         ctx.globalAlpha = 0.8;
         for (let i = 0; i < 30; i++) {
           const r = Math.random() * brushSize * 2;
@@ -157,12 +163,11 @@ export default function SketchEditor() {
           ctx.arc(x, y, 2.5, 0, Math.PI * 2);
           ctx.fill();
         }
-        // 关键修复：喷漆后重置混合模式和透明度
         ctx.globalCompositeOperation = 'source-over';
         ctx.globalAlpha = 1;
         break;
 
-      case 'inkjet': // 喷墨：小颗粒、低浓度、雾化扩散
+      case 'inkjet':
         ctx.globalAlpha = 0.2;
         for (let i = 0; i < 40; i++) {
           const r = Math.random() * brushSize * 3;
@@ -173,17 +178,15 @@ export default function SketchEditor() {
           ctx.arc(x, y, 1, 0, Math.PI * 2);
           ctx.fill();
         }
-        // 关键修复：喷墨后重置混合模式和透明度
         ctx.globalCompositeOperation = 'source-over';
         ctx.globalAlpha = 1;
         break;
 
-      case 'eraser': // 橡皮擦
+      case 'eraser':
         ctx.globalCompositeOperation = 'destination-out';
         ctx.lineWidth = brushSize;
         ctx.lineCap = 'round';
         ctx.stroke();
-        // 橡皮擦后重置混合模式
         ctx.globalCompositeOperation = 'source-over';
         break;
 
@@ -192,18 +195,17 @@ export default function SketchEditor() {
     }
   };
 
-  // 绘制形状（修复：移除半透明，始终实线）
+  // 绘制形状
   const drawShape = (start, end, isPreview = false) => {
     const ctx = context;
     if (!ctx) return;
-    
+
     ctx.save();
-    // 关键修复：强制重置混合模式和透明度
     ctx.globalCompositeOperation = 'source-over';
-    ctx.globalAlpha = 1; // 移除半透明，始终实线
+    ctx.globalAlpha = 1;
     ctx.lineWidth = brushSize;
     ctx.strokeStyle = brushColor;
-    ctx.setLineDash([]); // 实线预览
+    ctx.setLineDash([]);
 
     if (tool === 'circle') {
       const rx = Math.abs(end.x - start.x);
@@ -228,42 +230,45 @@ export default function SketchEditor() {
       ctx.closePath();
       ctx.stroke();
     }
+
     ctx.restore();
-    if (!isPreview) saveHistory(ctx);
+    if (!isPreview) {
+      saveHistory(ctx);
+    }
   };
 
-  // 预览形状（修复：实线预览，无半透明）
+  // 预览形状
   const drawPreview = (start, end) => {
     const canvas = canvasRef.current;
     const ctx = context;
     if (!ctx || !start || !end || historyIndex < 0) return;
 
-    // 先恢复上一步画面，避免预览残留
     const img = new Image();
     img.src = history[historyIndex];
     img.onload = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.drawImage(img, 0, 0);
-      // 关键修复：强制重置混合模式和透明度
+      ctx.clearRect(0, 0, canvas.width / 1, canvas.height / 1);
+      ctx.drawImage(img, 0, 0, canvas.width / 1, canvas.height / 1);
       ctx.globalCompositeOperation = 'source-over';
       ctx.globalAlpha = 1;
-      drawShape(start, end, true); // 实线预览，无半透明
+      drawShape(start, end, true); // 👈 关键：只预览，绝不保存历史
     };
   };
 
   // 开始绘制
   const startDraw = (e) => {
     e.preventDefault();
+    if (isDrawing) return; // 只加这一句防重复
+
     const pos = getPos(e);
     setIsDrawing(true);
     setStartPos(pos);
     setCurrentPos(pos);
-    // 形状工具不初始化路径，避免额外画线
+
     if (!['circle', 'rect', 'triangle'].includes(tool)) {
       context.beginPath();
       context.moveTo(pos.x, pos.y);
     }
-    // 关键修复：开始绘制前重置混合模式
+
     context.globalCompositeOperation = 'source-over';
     context.globalAlpha = 1;
   };
@@ -275,56 +280,61 @@ export default function SketchEditor() {
     const pos = getPos(e);
     setCurrentPos(pos);
     const ctx = context;
-    // 形状工具不绘制中间线条，只预览
+
     if (['circle', 'rect', 'triangle'].includes(tool)) {
       drawPreview(startPos, pos);
       return;
     }
+
     ctx.lineTo(pos.x, pos.y);
     drawBrush(ctx, pos);
   };
 
-  // 鼠标移动（更新鼠标位置，用于预览和光标样式）
+  // 鼠标移动
   const onMouseMove = (e) => {
     setMousePos(getPos(e));
   };
 
-  // 结束绘制（修复：橡皮擦后正常保存历史）
+  // 结束绘制（终极防重复：触屏永远只画1次）
   const endDraw = (e) => {
+    e.preventDefault();
     if (!isDrawing) return;
+
+    // 立刻关闭绘制
     setIsDrawing(false);
-    const pos = getPos(e);
+
+    const pos = currentPos;
+
+    // ✅ 形状工具：只执行 1 次绘制（防重复）
     if (['circle', 'rect', 'triangle'].includes(tool)) {
-      drawShape(startPos, pos, false);
-    } else {
+        drawShape(startPos, pos, false);
+    }
+    // ✅ 笔刷工具：正常绘制，不受影响
+    else {
       saveHistory(context);
-      // 关键修复：结束绘制后重置混合模式，避免影响后续操作
       context.globalCompositeOperation = 'source-over';
       context.globalAlpha = 1;
     }
   };
 
-  // 清空画布（修复：不再渐变变淡，直接清空）
+  // 清空画布
   const handleClear = () => {
     const canvas = canvasRef.current;
     const ctx = context;
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.clearRect(0, 0, canvas.width / FIXED_DPR, canvas.height / FIXED_DPR);
     ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    // 关键修复：清空后重置混合模式和透明度
+    ctx.fillRect(0, 0, canvas.width / FIXED_DPR, canvas.height / FIXED_DPR);
     ctx.globalCompositeOperation = 'source-over';
     ctx.globalAlpha = 1;
     saveHistory(ctx);
   };
 
-  // 完成绘制
   const handleGetSketch = () => {
     setCanvasImage(canvasRef.current.toDataURL('image/png'));
     setStep1Completed(true);
     setError('');
   };
 
-  // 生成图片
   const handleGenerateImage = async () => {
     if (!canvasImage) { setError('请先绘制'); return; }
     setLoading(true);
@@ -344,80 +354,68 @@ export default function SketchEditor() {
       </div>
 
       <div className="sketch-steps-container">
-          <div className="tool-group">
-            <div className="tool-grid">
-              <button className={`tool-btn ${tool === 'pencil' && 'active'}`} onClick={() => setTool('pencil')}>✏️ 铅笔</button>
-              <button className={`tool-btn ${tool === 'sketch' && 'active'}`} onClick={() => setTool('sketch')}>✏️ 素描</button>
-              <button className={`tool-btn ${tool === 'line' && 'active'}`} onClick={() => setTool('line')}>🖌️ 勾线</button>
-              <button className={`tool-btn ${tool === 'soft' && 'active'}`} onClick={() => setTool('soft')}>🖌️ 软毛</button>
-              <button className={`tool-btn ${tool === 'color' && 'active'}`} onClick={() => setTool('color')}>🎨 上色</button>
-              <button className={`tool-btn ${tool === 'crayon' && 'active'}`} onClick={() => setTool('crayon')}>🖍️ 蜡笔</button>
-              <button className={`tool-btn ${tool === 'ink' && 'active'}`} onClick={() => setTool('ink')}>🖌️ 墨水</button>
-              <button className={`tool-btn ${tool === 'spray' && 'active'}`} onClick={() => setTool('spray')}>💨 喷漆</button>
-              <button className={`tool-btn ${tool === 'inkjet' && 'active'}`} onClick={() => setTool('inkjet')}>🌫️ 喷墨</button>
-              <button className={`tool-btn ${tool === 'eraser' && 'active'}`} onClick={() => setTool('eraser')}>🧽 橡皮擦</button>
-              <button className={`tool-btn ${tool === 'circle' && 'active'}`} onClick={() => setTool('circle')}>⚫ 圆形</button>
-              <button className={`tool-btn ${tool === 'rect' && 'active'}`} onClick={() => setTool('rect')}>⬜ 矩形</button>
-              <button className={`tool-btn ${tool === 'triangle' && 'active'}`} onClick={() => setTool('triangle')}>🔺 三角</button>
-              <button className="tool-btn undo" onClick={handleUndo}>↩️ 撤销</button>
-              <button className="tool-btn clear" onClick={handleClear}>🗑️ 清空</button>
-            </div>
-
-            <div className="tool-settings">
-              <div>
-                <label>笔宽：</label>
-                <input type="range" min="1" max="40" value={brushSize} onChange={(e) => setBrushSize(e.target.value)} />
-                <span>{brushSize}px</span>
-              </div>
-              <div>
-                <label>颜色：</label>
-                <input type="color" value={brushColor} onChange={(e) => setBrushColor(e.target.value)} />
-              </div>
-            </div>
+        <div className="tool-group">
+          <div className="tool-grid">
+            <button className={`tool-btn ${tool === 'pencil' && 'active'}`} onClick={() => setTool('pencil')}>✏️ 铅笔</button>
+            <button className={`tool-btn ${tool === 'sketch' && 'active'}`} onClick={() => setTool('sketch')}>✏️ 素描</button>
+            <button className={`tool-btn ${tool === 'line' && 'active'}`} onClick={() => setTool('line')}>🖌️ 勾线</button>
+            <button className={`tool-btn ${tool === 'soft' && 'active'}`} onClick={() => setTool('soft')}>🖌️ 软毛</button>
+            <button className={`tool-btn ${tool === 'color' && 'active'}`} onClick={() => setTool('color')}>🎨 上色</button>
+            <button className={`tool-btn ${tool === 'crayon' && 'active'}`} onClick={() => setTool('crayon')}>🖍️ 蜡笔</button>
+            <button className={`tool-btn ${tool === 'ink' && 'active'}`} onClick={() => setTool('ink')}>🖌️ 墨水</button>
+            <button className={`tool-btn ${tool === 'spray' && 'active'}`} onClick={() => setTool('spray')}>💨 喷漆</button>
+            <button className={`tool-btn ${tool === 'inkjet' && 'active'}`} onClick={() => setTool('inkjet')}>🌫️ 喷墨</button>
+            <button className={`tool-btn ${tool === 'eraser' && 'active'}`} onClick={() => setTool('eraser')}>🧽 橡皮擦</button>
+            <button className={`tool-btn ${tool === 'circle' && 'active'}`} onClick={() => setTool('circle')}>⚫ 圆形</button>
+            <button className={`tool-btn ${tool === 'rect' && 'active'}`} onClick={() => setTool('rect')}>⬜ 矩形</button>
+            <button className={`tool-btn ${tool === 'triangle' && 'active'}`} onClick={() => setTool('triangle')}>🔺 三角</button>
+            <button className="tool-btn undo" onClick={handleUndo}>↩️ 撤销</button>
+            <button className="tool-btn clear" onClick={handleClear}>🗑️ 清空</button>
           </div>
 
-          <div 
-            style={{ 
-              transformOrigin: '0 0',
-              position: 'relative'
+          <div className="tool-settings">
+            <div>
+              <label>笔宽：</label>
+              <input type="range" min="1" max="40" value={brushSize} onChange={(e) => setBrushSize(e.target.value)} />
+              <span>{brushSize}px</span>
+            </div>
+            <div>
+              <label>颜色：</label>
+              <input type="color" value={brushColor} onChange={(e) => setBrushColor(e.target.value)} />
+            </div>
+          </div>
+        </div>
+
+        <div style={{ position: 'relative' }}>
+          <div
+            style={{
+              position: 'absolute',
+              left: `${mousePos.x}px`,
+              top: `${mousePos.y}px`,
+              width: `${brushSize}px`,
+              height: `${brushSize}px`,
+              borderRadius: '50%',
+              border: '1px solid #000',
+              pointerEvents: 'none',
+              transform: 'translate(-50%, -50%)',
+              zIndex: 10
             }}
-          >
-            {/* 自定义鼠标光标：圆形，大小随笔宽变化（形状工具也显示） */}
-            <div
-              style={{
-                position: 'absolute',
-                left: `${mousePos.x}px`,
-                top: `${mousePos.y}px`,
-                width: `${brushSize}px`,
-                height: `${brushSize}px`,
-                borderRadius: '50%',
-                border: '1px solid #000',
-                pointerEvents: 'none',
-                transform: 'translate(-50%, -50%)',
-                zIndex: 10
-              }}
-            />
-            <canvas
-              ref={canvasRef}
-              className="sketch-canvas"
-              onMouseDown={startDraw}
-              onMouseMove={(e) => {
-                onMouseMove(e);
-                onDraw(e);
-              }}
-              onMouseUp={endDraw}
-              onMouseLeave={endDraw}
-              onTouchStart={startDraw}
-              onTouchMove={onDraw}
-              onTouchEnd={endDraw}
-              style={{ 
-                touchAction: 'none',
-                cursor: 'none' // 始终隐藏默认光标，显示自定义圆形
-              }}
-            />
-          </div>
+          />
+          <canvas
+            ref={canvasRef}
+            className="sketch-canvas"
+            onMouseDown={startDraw}
+            onMouseMove={(e) => { onMouseMove(e); onDraw(e); }}
+            onMouseUp={endDraw}
+            onMouseLeave={endDraw}
+            onTouchStart={startDraw}
+            onTouchMove={onDraw}
+            onTouchEnd={endDraw}
+            style={{ touchAction: 'none', cursor: 'none' }}
+          />
+        </div>
 
-          <button className="btn-confirm" onClick={handleGetSketch}>✅ 完成绘制</button>
+        <button className="btn-confirm" onClick={handleGetSketch}>✅ 完成绘制</button>
 
         <div className={`step-panel step-2 ${!step1Completed ? 'disabled' : ''}`}>
           <h4 className="step-title">🎨 生成图像</h4>
@@ -428,17 +426,17 @@ export default function SketchEditor() {
             rows={3}
             style={{ width: '100%' }}
           />
-          <select value={style} onChange={(e) => setStyle(e.target.value)} style={{margin: '8px 0' }}>
-              <option value="realistic">现实主义</option>
-              <option value="oil_painting">油画风格</option>
-              <option value="watercolor">水彩风格</option>
-              <option value="pencil_sketch">铅笔素描</option>
-              <option value="cartoon">动漫风格</option>
-              <option value="3d">3D渲染</option>
-              <option value="cyberpunk">赛博朋克</option>
-              <option value="pixel_art">像素艺术</option>
-              <option value="ink_painting">国画风格</option>
-              <option value="steampunk">蒸汽朋克</option>
+          <select value={style} onChange={(e) => setStyle(e.target.value)} style={{ margin: '8px 0' }}>
+            <option value="realistic">现实主义</option>
+            <option value="oil_painting">油画风格</option>
+            <option value="watercolor">水彩风格</option>
+            <option value="pencil_sketch">铅笔素描</option>
+            <option value="cartoon">动漫风格</option>
+            <option value="3d">3D渲染</option>
+            <option value="cyberpunk">赛博朋克</option>
+            <option value="pixel_art">像素艺术</option>
+            <option value="ink_painting">国画风格</option>
+            <option value="steampunk">蒸汽朋克</option>
           </select>
 
           <button className="btn-generate" onClick={handleGenerateImage} disabled={loading}>
